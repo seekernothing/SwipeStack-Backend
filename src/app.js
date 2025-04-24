@@ -37,6 +37,28 @@ app.post("/signup", async (req, res) => {
   }
 });
 
+// Login api
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new Error("Invalid Credentials");
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
+      res.send("Login Successful !!!");
+    } else {
+      throw new Error("Invalid Credentials");
+    }
+  } catch (error) {
+    res.status(400).send(error.message);
+  }
+});
+
 //Feed api - GET /feed - get all the users from the database
 app.get("/feed", async (req, res) => {
   try {
@@ -123,3 +145,5 @@ connectDB()
   .catch((err) => {
     console.error("DB connection failed");
   });
+
+
