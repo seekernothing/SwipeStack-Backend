@@ -61,11 +61,30 @@ app.delete("/user", async (req, res) => {
 });
 
 // api to update the data of the user 🔴( data sanitization needed in post and patch apis)
-app.patch("/user", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => {
   const data = req.body;
-  const userId = req.body.userId;
+  const userId = req.params?.userId;
+
+  
 
   try {
+
+
+    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age","userId","skills"];
+
+  const isUpdateAllowed = Object.keys(data).every((k) =>
+    ALLOWED_UPDATES.includes(k)
+  );
+
+  if(!isUpdateAllowed){
+    throw new Error("Update is not allowed")
+  }
+
+  if(data.skills.length>10){
+    throw new Error("Maximum 10 skills are allowed")
+  }
+
+
     await User.findOneAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
       runValidators: true,
