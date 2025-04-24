@@ -3,22 +3,37 @@ const app = express();
 const PORT = process.env.PORT || 8000;
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const user = require("./models/user");
+const bcrypt = require("bcrypt");
+
+const { validatingSignUpData } = require("./utils/validation");
 require("dotenv").config();
 
 app.use(express.json());
 
 // Signup api  🔴( data sanitization needed in post and patch apis)
 app.post("/signup", async (req, res) => {
-  // creating a new instance of the User model
-  console.log(req.body);
-  const user = new User(req.body);
-
   try {
+    // validation of data
+    validatingSignUpData(req);
+
+    // Encrypt the password
+    const { firstName, lastName, email, password } = req.body;
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // creating a new instance of the User model
+    // console.log(req.body);
+    const user = new User({
+      firstName,
+      lastName,
+      email,
+      password: passwordHash,
+    });
+
     await user.save();
     res.send("User added sucessfully");
   } catch (error) {
-    res.status(400).send("Error saving the user " + error.message);
+    res.status(400).send("Error : " + error.message);
   }
 });
 
@@ -64,7 +79,7 @@ app.delete("/user", async (req, res) => {
 // api to update the data of the user 🔴( data sanitization needed in post and patch apis)
 app.patch("/user/:userId", async (req, res) => {
   const data = req.body;
-     const userId = req.params?.userId;
+  const userId = req.params?.userId;
 
   try {
     const ALLOWED_UPDATES = [
