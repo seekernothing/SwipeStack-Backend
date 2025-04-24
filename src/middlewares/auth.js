@@ -1,3 +1,5 @@
+
+
 const adminAuth = (req, res, next) => {
   const token = "xyz";
   const isAdminAuthorized = token === "xyz";
@@ -24,3 +26,4 @@ module.exports={
     adminAuth,
     userAuth
 }
+

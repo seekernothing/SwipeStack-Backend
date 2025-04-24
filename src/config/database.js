@@ -1,12 +1,11 @@
 const mongoose = require("mongoose")
 
 const connectDB = async ()=>{
-await mongoose.connect(
-  "mongodb+srv://swipestackadmin:swipe123@cluster0.sbpyhsw.mongodb.net/swipestack"
-);
+await mongoose.connect(process.env.MONGO_URI);
 }
 
 module.exports = connectDB
 
 
 
+      

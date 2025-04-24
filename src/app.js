@@ -1,9 +1,10 @@
 const express = require("express");
 const app = express();
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const user = require("./models/user");
+require("dotenv").config();
 
 app.use(express.json());
 
@@ -65,25 +66,27 @@ app.patch("/user/:userId", async (req, res) => {
   const data = req.body;
   const userId = req.params?.userId;
 
-  
-
   try {
+    const ALLOWED_UPDATES = [
+      "photoUrl",
+      "about",
+      "gender",
+      "age",
+      "userId",
+      "skills",
+    ];
 
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
 
-    const ALLOWED_UPDATES = ["photoUrl", "about", "gender", "age","userId","skills"];
+    if (!isUpdateAllowed) {
+      throw new Error("Update is not allowed");
+    }
 
-  const isUpdateAllowed = Object.keys(data).every((k) =>
-    ALLOWED_UPDATES.includes(k)
-  );
-
-  if(!isUpdateAllowed){
-    throw new Error("Update is not allowed")
-  }
-
-  if(data.skills.length>10){
-    throw new Error("Maximum 10 skills are allowed")
-  }
-
+    if (data.skills.length > 10) {
+      throw new Error("Maximum 10 skills are allowed");
+    }
 
     await User.findOneAndUpdate({ _id: userId }, data, {
       returnDocument: "after",
@@ -99,7 +102,7 @@ connectDB()
   .then(() => {
     console.log("Database connection is successful");
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server is running on port ${process.env.PORT}`);
     });
   })
   .catch((err) => {
