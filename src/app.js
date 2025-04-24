@@ -64,7 +64,7 @@ app.delete("/user", async (req, res) => {
 // api to update the data of the user 🔴( data sanitization needed in post and patch apis)
 app.patch("/user/:userId", async (req, res) => {
   const data = req.body;
-  const userId = req.params?.userId;
+     const userId = req.params?.userId;
 
   try {
     const ALLOWED_UPDATES = [
