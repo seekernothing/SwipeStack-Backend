@@ -4,25 +4,22 @@ const PORT = process.env.PORT || 8000;
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const bcrypt = require("bcrypt");
-
+const cookieParser = require("cookie-parser");
 const { validatingSignUpData } = require("./utils/validation");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 require("dotenv").config();
 
 app.use(express.json());
+app.use(cookieParser());
 
-// Signup api  🔴( data sanitization needed in post and patch apis)
+// 🟢 Signup API
 app.post("/signup", async (req, res) => {
   try {
-    // validation of data
     validatingSignUpData(req);
-
-    // Encrypt the password
     const { firstName, lastName, email, password } = req.body;
-
     const passwordHash = await bcrypt.hash(password, 10);
 
-    // creating a new instance of the User model
-    // console.log(req.body);
     const user = new User({
       firstName,
       lastName,
@@ -31,119 +28,55 @@ app.post("/signup", async (req, res) => {
     });
 
     await user.save();
-    res.send("User added sucessfully");
+    res.send("User added successfully");
   } catch (error) {
-    res.status(400).send("Error : " + error.message);
+    res.status(400).send("Error: " + error.message);
   }
 });
 
-// Login api
-
+// 🟢 Login API
 app.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
+    const user = await User.findOne({ email });
 
-    const user = await User.findOne({ email: email });
-    if (!user) {
-      throw new Error("Invalid Credentials");
-    }
+    if (!user) throw new Error("Invalid Credentials");
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-    if (isPasswordValid) {
-      res.send("Login Successful !!!");
-    } else {
-      throw new Error("Invalid Credentials");
-    }
+    const isPasswordValid = await user.validatePassword;(password)
+    if (!isPasswordValid) throw new Error("Invalid Credentials");
+
+    const token = await user.getJWT()
+    res.cookie("token", token);
+    res.send("Login Successful!");
   } catch (error) {
     res.status(400).send(error.message);
   }
 });
 
-//Feed api - GET /feed - get all the users from the database
-app.get("/feed", async (req, res) => {
+// 🟢 Profile API
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    const users = await User.find({});
-    res.send(users);
+    const user = req.user;
+    res.send(user);
   } catch (error) {
-    res.status(400).send("Something went wrong");
+    res.status(401).send("Invalid or expired token");
   }
 });
 
-//Get user by email
-app.get("/user", async (req, res) => {
-  const userEmail = req.body.email;
-
-  try {
-    const users = await User.find({ email: userEmail });
-    if (users.length === 0) {
-      res.status(404).send("User not found");
-    }
-    res.send(users);
-  } catch (error) {
-    res.status(401).send("Something went wrong");
-  }
+app.post("/sendConnectionRequest", userAuth, async (req, res) => {
+  //send connection request
+  console.log("connection request sent");
+  res.send("Connection request sent!");
 });
 
-// api to delete user by id
-
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-
-  try {
-    // const user = await User.findByIdAndDelete({_id: userId})
-    const user = await User.findByIdAndDelete(userId); // this one is shorthand for upper-one
-    res.send("User deleted successfully");
-  } catch (error) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-// api to update the data of the user 🔴( data sanitization needed in post and patch apis)
-app.patch("/user/:userId", async (req, res) => {
-  const data = req.body;
-  const userId = req.params?.userId;
-
-  try {
-    const ALLOWED_UPDATES = [
-      "photoUrl",
-      "about",
-      "gender",
-      "age",
-      "userId",
-      "skills",
-    ];
-
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      ALLOWED_UPDATES.includes(k)
-    );
-
-    if (!isUpdateAllowed) {
-      throw new Error("Update is not allowed");
-    }
-
-    if (data.skills.length > 10) {
-      throw new Error("Maximum 10 skills are allowed");
-    }
-
-    await User.findOneAndUpdate({ _id: userId }, data, {
-      returnDocument: "after",
-      runValidators: true,
-    });
-    res.send("User updated successfully");
-  } catch (error) {
-    res.status(400).send("Update failed :" + error.message);
-  }
-});
-
+// 🟢 Start Server
 connectDB()
   .then(() => {
-    console.log("Database connection is successful");
+    console.log("Database connection successful");
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${process.env.PORT}`);
+      console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch((err) => {
-    console.error("DB connection failed");
+    console.error("DB connection failed:", err);
   });
-
-
