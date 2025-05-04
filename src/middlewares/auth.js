@@ -3,6 +3,7 @@ const User = require("../models/user");
 
 const userAuth = async (req, res, next) => {
   try {
+    
     //Read the token from req cookies
     
     const { token } = req.cookies;
@@ -29,3 +30,10 @@ const userAuth = async (req, res, next) => {
 module.exports = {
   userAuth,
 };
+
+
+
+
+
+
+

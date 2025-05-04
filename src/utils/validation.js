@@ -15,3 +15,14 @@ const validatingSignUpData = (req) => {
 module.exports = {
   validatingSignUpData,
 };
+
+
+
+
+
+
+
+
+
+
+

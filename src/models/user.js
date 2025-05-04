@@ -57,7 +57,7 @@ const userSchema = new mongoose.Schema(
     about: {
       type: String,
       default:
-        "Seek within my friends you only need you. embrace every aspect of life. be empathatic and good to every person . all of us are stuck in this simulation and our time is limted this thing only make you realize that we should help each other and respectful towards each other ",
+        "Seek within my friends the only person you need is yourself ",
     },
     skills: {
       type: [String, String],
