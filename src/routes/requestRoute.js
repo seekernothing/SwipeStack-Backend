@@ -28,8 +28,6 @@ requestRouter.post(
           .json({ message: "Invalid status type:" + status });
       }
 
-      
-
       //check if the connection sending person exists in database or not
 
       const toUser = await User.findById(toUserId);
@@ -60,8 +58,13 @@ requestRouter.post(
 
       const data = await connectionRequest.save();
 
+      const message =
+        status === "interested"
+          ? `${req.user.firstName} is interested in ${toUser.firstName}`
+          : `${req.user.firstName} ignored ${toUser.firstName}`;
+
       res.json({
-        message: "Connection request sent successfully",
+        message,
         data,
       });
     } catch (error) {

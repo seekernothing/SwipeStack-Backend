@@ -1,13 +1,14 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
-const jwt = require("jsonwebtoken")
-const bcrypt = require("bcrypt")
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 const userSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
       requires: true,
+      index: true,
       minLength: 2,
       maxLength: 20,
     },
@@ -56,8 +57,7 @@ const userSchema = new mongoose.Schema(
     },
     about: {
       type: String,
-      default:
-        "Seek within my friends the only person you need is yourself ",
+      default: "Seek within my friends the only person you need is yourself ",
     },
     skills: {
       type: [String, String],
@@ -68,24 +68,26 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+
+
 userSchema.methods.getJWT = async function () {
-  const user = this
+  const user = this;
   const token = await jwt.sign({ _id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
 
-  return token
+  return token;
 };
 
-
-userSchema.methods.validatePassword = async function(passwordInputByUser){
+userSchema.methods.validatePassword = async function (passwordInputByUser) {
   const user = this;
-  const passwordHash = user.password
+  const passwordHash = user.password;
   const isPasswordValid = await bcrypt.compare(
     passwordInputByUser,
     passwordHash
   );
   return isPasswordValid;
-}
+};
 
 module.exports = mongoose.model("User", userSchema);
+
