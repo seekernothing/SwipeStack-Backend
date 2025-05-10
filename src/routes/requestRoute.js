@@ -73,4 +73,45 @@ requestRouter.post(
   }
 );
 
+requestRouter.post(
+  "/request/review/:status/:requestId",
+  userAuth,
+  async (req, res) => {
+    try {
+      // validation ---> only check foor accepted & rejected only
+      const loggedInUserId = req.user;
+      const { status, requestId } = req.params;
+      const allowedStatus = ["accepted", "rejected"];
+
+      if (!allowedStatus.includes(status)) {
+        return res
+          .status(400)
+          .json({ message: "Invalid status type:" + req.params.status });
+      }
+
+      //check if the request id is present in the database or not
+      const connectionRequest = await connectionRequestModel.findById({
+        _id: requestId,
+        toUserId: loggedInUserId._id,
+        status: "interested",
+      });
+
+      if (!connectionRequest) {
+        return res.status(404).json({ message: "Request not found" });
+      }
+
+      connectionRequest.status = status;
+
+      const data = await connectionRequest.save();
+      const message =
+        status === "accepted"
+          ? `${req.user.firstName} accepted your request`
+          : `${req.user.firstName} rejected your request`;
+      res.json({ message, data });
+    } catch (error) {
+      res.status(404).send("Error: " + error.message);
+    }
+  }
+);
+
 module.exports = requestRouter;
