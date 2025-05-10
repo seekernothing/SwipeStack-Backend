@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/authRoute");
 const profileRouter = require("./routes/profileRoute");
 const requestRouter = require("./routes/requestRoute");
+const userRouter = require("./routes/userRoute");
 
 // const User = require("./models/user");
 // const bcrypt = require("bcrypt");
@@ -29,6 +30,7 @@ app.use(cookieParser());
 app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
+app.use("/", userRouter);
 
 // 🟢 Start Server
 connectDB()
