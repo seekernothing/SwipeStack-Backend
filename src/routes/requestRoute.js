@@ -110,6 +110,7 @@ requestRouter.post(
       res.json({ message, data });
     } catch (error) {
       res.status(404).send("Error: " + error.message);
+      
     }
   }
 );
