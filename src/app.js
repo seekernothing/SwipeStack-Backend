@@ -9,14 +9,14 @@ const requestRouter = require("./routes/requestRoute");
 const userRouter = require("./routes/userRoute");
 const cors = require("cors");
 
-// const User = require("./models/user");
-// const bcrypt = require("bcrypt");
 
-// const { validatingSignUpData } = require("../utils/validation");
-// const jwt = require("jsonwebtoken");
-// const { userAuth } = require("./middlewares/auth");
 require("dotenv").config();
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
