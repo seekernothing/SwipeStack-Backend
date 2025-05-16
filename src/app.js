@@ -7,6 +7,7 @@ const authRouter = require("./routes/authRoute");
 const profileRouter = require("./routes/profileRoute");
 const requestRouter = require("./routes/requestRoute");
 const userRouter = require("./routes/userRoute");
+const cors = require("cors");
 
 // const User = require("./models/user");
 // const bcrypt = require("bcrypt");
@@ -15,7 +16,7 @@ const userRouter = require("./routes/userRoute");
 // const jwt = require("jsonwebtoken");
 // const { userAuth } = require("./middlewares/auth");
 require("dotenv").config();
-
+app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
