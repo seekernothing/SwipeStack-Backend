@@ -8,9 +8,9 @@ const profileRouter = require("./routes/profileRoute");
 const requestRouter = require("./routes/requestRoute");
 const userRouter = require("./routes/userRoute");
 const cors = require("cors");
-
-
 require("dotenv").config();
+
+
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -20,13 +20,7 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
-// 🟢 Signup API
 
-// 🟢 Login API
-
-// 🟢 Profile API
-
-// send request API
 
 app.use("/", authRouter);
 app.use("/", profileRouter);

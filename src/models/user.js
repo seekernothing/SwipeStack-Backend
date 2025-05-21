@@ -53,11 +53,12 @@ const userSchema = new mongoose.Schema(
     },
     photoUrl: {
       type: String,
-      default: "https://static.thenounproject.com/png/3424293-200.png",
+      default:
+        "https://img.freepik.com/premium-vector/vector-flat-illustration-grayscale-avatar-user-profile-person-icon-gender-neutral-silhouette-profile-picture-suitable-social-media-profiles-icons-screensavers-as-templatex9xa_719432-2210.jpg?semt=ais_hybrid&w=740",
     },
     about: {
       type: String,
-      default: "Seek within my friends the only person you need is yourself ",
+      default: "Hello There ",
     },
     skills: {
       type: [String, String],
@@ -67,8 +68,6 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-
 
 userSchema.methods.getJWT = async function () {
   const user = this;
@@ -90,4 +89,3 @@ userSchema.methods.validatePassword = async function (passwordInputByUser) {
 };
 
 module.exports = mongoose.model("User", userSchema);
-
