@@ -10,17 +10,26 @@ const userRouter = require("./routes/userRoute");
 const cors = require("cors");
 require("dotenv").config();
 
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173",
+//     credentials: true,
+//     methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+//   })
+// );
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+const corsOptions = {
+  origin: "http://localhost:5173",
+  credentials: true,
+  methods: ["GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS"],
+};
+
+app.use(cors(corsOptions));
+
+//  app.options("*", cors());
+
 app.use(express.json());
 app.use(cookieParser());
-
-
 
 app.use("/", authRouter);
 app.use("/", profileRouter);
