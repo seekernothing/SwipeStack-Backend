@@ -1,6 +1,16 @@
 const socket = require("socket.io");
+const crypto = require("crypto");
+const { Chat } = require("../models/chat");
+const User = require("../models/user");
+const connectionRequest = require("../models/connectionRequest");
+const getSecretRoomId = (userId, targetUserId) => {
+  return crypto
+    .createHash("sha256")
+    .update([userId, targetUserId].sort().join("_"))
+    .digest("hex");
+};
 
-const initalizeSocket = (server) => {
+const initializeSocket = (server) => {
   const io = socket(server, {
     cors: {
       origin: "http://localhost:5173",
@@ -8,16 +18,66 @@ const initalizeSocket = (server) => {
   });
 
   io.on("connection", (socket) => {
-    // Handel events
+    socket.on("joinChat", ({ firstName, userId, targetUserId }) => {
+      const roomId = getSecretRoomId(userId, targetUserId);
+      console.log(`${firstName} joined the room: ${roomId}`);
+      socket.join(roomId);
+    });
 
-    socket.on("joinChat",()=>{})
+    socket.on(
+      "sendMessage",
+      async ({ firstName, userId, targetUserId, text }) => {
+       
 
 
-    socket.on("sendMessage",()=>{})
+        try {
+
+          const roomId = getSecretRoomId(userId, targetUserId);
+          console.log(`${firstName}: ${text}`);
+
+          
+          let chat = await Chat.findOne({
+            participants: { $all: [userId, targetUserId] },
+          });
 
 
-    socket.on("disconnect",()=>{})
+
+          if (!chat) {
+            chat = new Chat({
+              participants: [userId, targetUserId],
+              messages: [],
+            });
+          }
+
+          chat.messages.push({
+            senderId: userId,
+            text,
+          });
+
+          await chat.save();
+
+          // Get sender's photo URL
+          const sender = await User.findById(userId).select("photoUrl");
+
+          const messagePayload = {
+            firstName,
+            text,
+            userId,
+            photoUrl: sender?.photoUrl || null,
+          };
+
+          // ✅ Emit to all users in the room
+          io.to(roomId).emit("messageReceived", messagePayload);
+        } catch (error) {
+          console.error("Socket sendMessage error:", error.message);
+        }
+      }
+    );
+
+    socket.on("disconnect", () => {
+      console.log("User disconnected");
+    });
   });
 };
 
-module.exports = initalizeSocket;
+module.exports = initializeSocket;

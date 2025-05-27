@@ -7,6 +7,7 @@ const authRouter = require("./routes/authRoute");
 const profileRouter = require("./routes/profileRoute");
 const requestRouter = require("./routes/requestRoute");
 const userRouter = require("./routes/userRoute");
+const chatRouter = require("./routes/chatRoute");
 const cors = require("cors");
 const http = require("http");
 const initalizeSocket = require("./utils/socket");
@@ -36,6 +37,7 @@ app.use("/", authRouter);
 app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
+app.use("/", chatRouter);
 
 
 const server = http.createServer(app);
