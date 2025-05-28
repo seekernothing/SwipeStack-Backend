@@ -6,9 +6,7 @@ const { validatingSignUpData } = require("../utils/validation");
 
 const bcrypt = require("bcrypt");
 const User = require("../models/user");
-// const cookieParser = require("cookie-parser");
-// authRouter.use(cookieParser());
-// authRouter.use(express.json());
+
 
 // Signup api
 
