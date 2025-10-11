@@ -40,7 +40,7 @@ initalizeSocket(server)
 
 
 
-// 🟢 Start Server
+//  Start Server
 connectDB()
   .then(() => {
     console.log("Database connection successful");
