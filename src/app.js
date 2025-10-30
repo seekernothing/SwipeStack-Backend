@@ -11,6 +11,7 @@ const chatRouter = require("./routes/chatRoute");
 const cors = require("cors");
 const http = require("http");
 const initalizeSocket = require("./utils/socket");
+const paymentRouter = require("./routes/paymentRoute");
 require("dotenv").config();
 
 
@@ -32,6 +33,7 @@ app.use("/", profileRouter);
 app.use("/", requestRouter);
 app.use("/", userRouter);
 app.use("/", chatRouter);
+app.use("/", paymentRouter);
 
 
 const server = http.createServer(app);
