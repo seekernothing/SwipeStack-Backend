@@ -2,6 +2,7 @@ const express = require("express");
 const { userAuth } = require("../middlewares/auth");
 const paymentRouter = express.Router();
 const razorpayInstance = require("../utils/razorpay")
+const Payment = require("../models/payment")
 
 paymentRouter.post("/payment/create", userAuth, async (req, res) => {
   try {
@@ -18,10 +19,21 @@ paymentRouter.post("/payment/create", userAuth, async (req, res) => {
       
     });
 
-  
+       const payment = new Payment({
+        userId : req.user._id,
+        orderId:order.id,
+        status:order.status,
+        amount:order.amount,
+        currency:order.currency,
+        receipt:order.receipt,
+        notes:order.notes,
+
+       })
+
+       const savedPayment = await payment.save()
     
 
-    res.json({order})
+    res.json({...savedPayment.toJSON()})
   } catch (error) {
     return res.status(500).json({msg:error.message})
   }
