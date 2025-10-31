@@ -1,3 +1,4 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -12,9 +13,6 @@ const cors = require("cors");
 const http = require("http");
 const initalizeSocket = require("./utils/socket");
 const paymentRouter = require("./routes/paymentRoute");
-require("dotenv").config();
-
-
 
 const corsOptions = {
   origin: ["http://localhost:5173", "http://13.203.205.52"],
@@ -23,7 +21,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 
 app.use(express.json());
 app.use(cookieParser());
@@ -35,12 +32,8 @@ app.use("/", userRouter);
 app.use("/", chatRouter);
 app.use("/", paymentRouter);
 
-
 const server = http.createServer(app);
-initalizeSocket(server)
-
-
-
+initalizeSocket(server);
 
 //  Start Server
 connectDB()
@@ -53,6 +46,3 @@ connectDB()
   .catch((err) => {
     console.error("DB connection failed:", err);
   });
-
-
-  
